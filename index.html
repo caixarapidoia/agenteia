@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente24hrs — Ganhe dinheiro vendendo agentes de IA</title>
+
+<style>
+  :root {
+    --preto: #080C10;
+    --azul-escuro: #0A1628;
+    --azul: #0E4FD8;
+    --ciano: #00D4FF;
+    --ciano-glow: rgba(0,212,255,0.15);
+    --branco: #FFFFFF;
+    --cinza: #A0AAB8;
+    --cinza-claro: #F0F4F8;
+    --verde: #00E676;
+    --amarelo: #FFD600;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--preto);
+    color: var(--branco);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── UTILITÁRIOS ── */
+  .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  .tag {
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+  .tag-ciano { background: var(--ciano-glow); color: var(--ciano); border: 1px solid var(--ciano); }
+  .tag-verde { background: rgba(0,230,118,0.1); color: var(--verde); border: 1px solid var(--verde); }
+  .tag-amarelo { background: rgba(255,214,0,0.1); color: var(--amarelo); border: 1px solid var(--amarelo); }
+
+  h1, h2, h3 { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif; }
+
+  /* ── HEADER FLUTUANTE ── */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 14px 24px;
+    background: rgba(8,12,16,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,212,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-texto {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ciano);
+    letter-spacing: 1px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 8px 16px; border-radius: 100px;
+    font-size: 13px; color: var(--ciano);
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--ciano); border-radius: 50%; animation: pulse 1.5s infinite; }
+
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 58px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--ciano); }
+
+  .hero-sub {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--cinza);
+    max-width: 560px;
+    margin-bottom: 48px;
+    font-weight: 300;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-cta { animation: fadeUp 0.6s 0.3s ease both; }
+
+  .btn-principal {
+    display: inline-block;
+    background: var(--ciano);
+    color: var(--preto);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    padding: 18px 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    box-shadow: 0 0 40px rgba(0,212,255,0.3);
+  }
+  .btn-principal:hover {
+    background: var(--branco);
+    box-shadow: 0 0 60px rgba(0,212,255,0.5);
+    transform: translateY(-2px);
+  }
+
+  .hero-preco {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--cinza);
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .hero-preco strong { color: var(--verde); }
+
+  /* ── NÚMEROS ── */
+  .numeros {
+    padding: 60px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .numeros-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+  .numero-item {
+    background: var(--preto);
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .numero-valor {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--ciano);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .numero-label {
+    font-size: 13px;
+    color: var(--cinza);
+    line-height: 1.4;
+  }
+
+  /* ── SEÇÕES ── */
+  .secao { padding: 100px 0; }
+  .secao-titulo {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+  .secao-titulo em { font-style: normal; color: var(--ciano); }
+  .secao-sub {
+    font-size: 16px;
+    color: var(--cinza);
+    line-height: 1.7;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  /* ── DOR ── */
+  .dor-bg { background: var(--azul-escuro); }
+  .dor-lista { display: flex; flex-direction: column; gap: 16px; }
+  .dor-item {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 24px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+  }
+  .dor-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .dor-texto { font-size: 15px; line-height: 1.6; color: var(--cinza); }
+  .dor-texto strong { color: var(--branco); }
+
+  /* ── SOLUÇÃO ── */
+  .solucao-card {
+    background: linear-gradient(135deg, rgba(14,79,216,0.15), rgba(0,212,255,0.05));
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 8px;
+    padding: 48px;
+    margin-bottom: 32px;
+  }
+  .solucao-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ciano);
+  }
+  .solucao-card p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--cinza);
+    font-weight: 300;
+  }
+
+  /* ── O QUE VOCÊ APRENDE ── */
+  .modulos { display: flex; flex-direction: column; gap: 2px; }
+  .modulo {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 22px 24px;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .modulo:hover {
+    background: rgba(0,212,255,0.05);
+    border-left-color: var(--ciano);
+  }
+  .modulo-num {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ciano);
+    opacity: 0.5;
+    min-width: 28px;
+    padding-top: 2px;
+  }
+  .modulo-info h4 {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .modulo-info p {
+    font-size: 13px;
+    color: var(--cinza);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* ── QUANTO GANHA ── */
+  .ganho-bg { background: var(--azul-escuro); }
+  .ganho-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .ganho-card {
+    padding: 28px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+  }
+  .ganho-card .valor {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--verde);
+    margin-bottom: 6px;
+  }
+  .ganho-card .descricao {
+    font-size: 13px;
+    color: var(--cinza);
+    line-height: 1.5;
+  }
+  .ganho-card .descricao strong { color: var(--branco); }
+
+  /* ── PARA QUEM É ── */
+  .para-quem-lista { display: flex; flex-direction: column; gap: 12px; }
+  .para-quem-item {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 15px;
+    color: var(--cinza);
+    padding: 16px 20px;
+    background: rgba(0,230,118,0.04);
+    border: 1px solid rgba(0,230,118,0.1);
+    border-radius: 4px;
+  }
+  .para-quem-item::before {
+    content: '✓';
+    color: var(--verde);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* ── ORDER BUMP ── */
+  .bump-box {
+    border: 2px dashed rgba(255,214,0,0.4);
+    background: rgba(255,214,0,0.03);
+    border-radius: 8px;
+    padding: 40px;
+    margin-top: 60px;
+  }
+  .bump-titulo {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--amarelo);
+    margin-bottom: 12px;
+  }
+  .bump-desc {
+    font-size: 15px;
+    color: var(--cinza);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+  .bump-preco {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--amarelo);
+  }
+
+  /* ── GARANTIA ── */
+  .garantia-box {
+    display: flex; align-items: center; gap: 32px;
+    padding: 48px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    margin-top: 60px;
+  }
+  .garantia-icon {
+    font-size: 64px;
+    flex-shrink: 0;
+  }
+  .garantia-titulo {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .garantia-texto {
+    font-size: 14px;
+    color: var(--cinza);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── PREÇO ── */
+  .preco-bg { background: var(--azul-escuro); }
+  .preco-box {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 60px 48px;
+    background: linear-gradient(135deg, rgba(14,79,216,0.2), rgba(0,212,255,0.05));
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 12px;
+  }
+  .preco-de {
+    font-size: 16px;
+    color: var(--cinza);
+    text-decoration: line-through;
+    margin-bottom: 8px;
+  }
+  .preco-por {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--branco);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .preco-por span {
+    font-size: 28px;
+    color: var(--ciano);
+    vertical-align: super;
+  }
+  .preco-label {
+    font-size: 13px;
+    color: var(--cinza);
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  }
+  .preco-inclui {
+    text-align: left;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .preco-inclui-item {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px;
+    color: var(--cinza);
+  }
+  .preco-inclui-item::before {
+    content: '✓';
+    color: var(--ciano);
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    flex-shrink: 0;
+  }
+  .btn-comprar {
+    display: block;
+    background: var(--ciano);
+    color: var(--preto);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    padding: 20px 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+    transition: all 0.2s;
+    box-shadow: 0 0 40px rgba(0,212,255,0.3);
+    margin-bottom: 16px;
+  }
+  .btn-comprar:hover {
+    background: var(--branco);
+    box-shadow: 0 0 60px rgba(0,212,255,0.5);
+    transform: translateY(-2px);
+  }
+  .preco-seguranca {
+    font-size: 12px;
+    color: var(--cinza);
+    opacity: 0.6;
+  }
+
+  /* ── FAQ ── */
+  .faq-lista { display: flex; flex-direction: column; gap: 2px; }
+  .faq-item {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .faq-pergunta {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--branco);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    padding: 24px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .faq-pergunta:hover { color: var(--ciano); }
+  .faq-seta { color: var(--ciano); font-size: 18px; transition: transform 0.2s; flex-shrink: 0; }
+  .faq-item.aberto .faq-seta { transform: rotate(45deg); }
+  .faq-resposta {
+    font-size: 14px;
+    color: var(--cinza);
+    line-height: 1.7;
+    font-weight: 300;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  .faq-item.aberto .faq-resposta {
+    max-height: 300px;
+    padding-bottom: 24px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    padding: 48px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+  }
+  .footer p {
+    font-size: 12px;
+    color: var(--cinza);
+    opacity: 0.5;
+    line-height: 1.8;
+  }
+
+  /* ── ANIMAÇÕES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  /* ── RESPONSIVO ── */
+  @media (max-width: 640px) {
+    .numeros-grid { grid-template-columns: 1fr; }
+    .ganho-grid   { grid-template-columns: 1fr; }
+    .garantia-box { flex-direction: column; text-align: center; }
+    .preco-box    { padding: 40px 24px; }
+    .bump-box     { padding: 28px 24px; }
+    .solucao-card { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <p class="header-texto">⚡ Oferta por tempo limitado — R$27,00</p>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-badge">
+      <span></span>
+      Mercado de IA crescendo 40% ao ano
+    </div>
+    <h1>Ganhe de <em>R$500 a R$2.000</em> vendendo agentes de IA para empresas</h1>
+    <p class="hero-sub">
+      Um guia técnico completo para criar, configurar e vender seu primeiro agente de inteligência artificial no WhatsApp — mesmo sem experiência prévia.
+    </p>
+    <div class="hero-cta">
+      <a href="#comprar" class="btn-principal">Quero começar agora</a>
+      <p class="hero-preco">Por apenas <strong>R$27,00</strong> · Acesso imediato · Garantia de 7 dias</p>
+    </div>
+  </div>
+</section>
+
+<!-- NÚMEROS -->
+<section class="numeros">
+  <div class="container">
+    <div class="numeros-grid">
+      <div class="numero-item">
+        <div class="numero-valor">20M+</div>
+        <div class="numero-label">Pequenas empresas no Brasil sem automação de atendimento</div>
+      </div>
+      <div class="numero-item">
+        <div class="numero-valor">R$500</div>
+        <div class="numero-label">Ticket mínimo por agente implementado</div>
+      </div>
+      <div class="numero-item">
+        <div class="numero-valor">24h</div>
+        <div class="numero-label">Tempo para ter seu agente funcionando e pronto para vender</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOR -->
+<section class="secao dor-bg">
+  <div class="container">
+    <div class="tag tag-ciano">Você se identifica?</div>
+    <h2 class="secao-titulo">Você quer ganhar dinheiro no digital mas <em>ainda não encontrou o caminho certo</em></h2>
+    <p class="secao-sub">A maioria das pessoas tenta renda extra online e fracassa pelos mesmos motivos.</p>
+    <div class="dor-lista">
+      <div class="dor-item">
+        <div class="dor-icon">😤</div>
+        <p class="dor-texto"><strong>Já tentou afiliados, dropshipping ou day trade</strong> e não conseguiu resultado real — ou precisou de muito investimento para pouco retorno.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-icon">📱</div>
+        <p class="dor-texto"><strong>Não quer depender de redes sociais</strong> para ganhar dinheiro — criar conteúdo todo dia cansa e os resultados demoram meses.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-icon">🤯</div>
+        <p class="dor-texto"><strong>Ouviu falar de IA mas achou técnico demais</strong> — parecia um mercado só para programadores e pessoas com formação específica.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-icon">🕐</div>
+        <p class="dor-texto"><strong>Quer algo que gere renda real</strong> sem precisar trocar horas por dinheiro indefinidamente — um serviço que se repete e escala.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUÇÃO -->
+<section class="secao">
+  <div class="container">
+    <div class="tag tag-verde">A solução</div>
+    <h2 class="secao-titulo">Agentes de IA são o serviço mais procurado por pequenas empresas <em>agora</em></h2>
+    <p class="secao-sub">
+      Todo negócio com WhatsApp ativo tem o mesmo problema: perdem clientes por não responder rápido o suficiente. Você resolve isso. Eles pagam por isso.
+    </p>
+    <div class="solucao-card">
+      <h3>O que é um Agente24hrs</h3>
+      <p>
+        É um sistema automatizado que conecta inteligência artificial ao WhatsApp de uma empresa. Ele responde clientes instantaneamente, entende o contexto da conversa, apresenta produtos e encaminha para a venda — tudo sem intervenção humana, 24 horas por dia.
+        <br><br>
+        Para o empresário, é um funcionário que nunca dorme e nunca pede aumento. Para você, é um serviço que pode ser vendido repetidamente para dezenas de clientes diferentes.
+      </p>
+    </div>
+    <div class="solucao-card">
+      <h3>Por que você consegue fazer isso sem ser programador</h3>
+      <p>
+        Com as ferramentas certas — N8N e Evolution API — você monta o agente de forma visual, conectando blocos como peças de um quebra-cabeça. Não precisa escrever uma linha de código. O guia te mostra exatamente cada passo, com prints e instruções diretas.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- O QUE APRENDE -->
+<section class="secao dor-bg">
+  <div class="container">
+    <div class="tag tag-ciano">Conteúdo completo</div>
+    <h2 class="secao-titulo">Do zero ao <em>primeiro cliente pago</em> em 7 dias</h2>
+    <p class="secao-sub">10 capítulos diretos ao ponto. Nada de enrolação.</p>
+    <div class="modulos">
+      <div class="modulo">
+        <div class="modulo-num">01</div>
+        <div class="modulo-info">
+          <h4>O mercado de agentes de IA</h4>
+          <p>Por que essa oportunidade existe agora e quanto tempo ela dura</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">02</div>
+        <div class="modulo-info">
+          <h4>Ferramentas necessárias</h4>
+          <p>O que instalar, onde criar conta e quanto vai custar para começar</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">03</div>
+        <div class="modulo-info">
+          <h4>Configurando o N8N</h4>
+          <p>Instalação passo a passo — versão gratuita em nuvem ou servidor próprio</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">04</div>
+        <div class="modulo-info">
+          <h4>Conectando ao WhatsApp</h4>
+          <p>Como usar a Evolution API para integrar o agente ao WhatsApp em minutos</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">05</div>
+        <div class="modulo-info">
+          <h4>Construindo o fluxo do agente</h4>
+          <p>Cada nó explicado — do webhook até o envio da resposta</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">06</div>
+        <div class="modulo-info">
+          <h4>Configurando a inteligência artificial</h4>
+          <p>Google Gemini (gratuito) ou OpenAI GPT — como escolher e configurar cada um</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">07</div>
+        <div class="modulo-info">
+          <h4>Testando antes de entregar</h4>
+          <p>Protocolo de 6 testes obrigatórios para garantir que o agente funciona</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">08</div>
+        <div class="modulo-info">
+          <h4>Precificação e planos</h4>
+          <p>Três modelos prontos de precificação — Starter, Profissional e Recorrente</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">09</div>
+        <div class="modulo-info">
+          <h4>Encontrando clientes</h4>
+          <p>Os 5 tipos de negócio que mais compram e onde encontrá-los hoje mesmo</p>
+        </div>
+      </div>
+      <div class="modulo">
+        <div class="modulo-num">10</div>
+        <div class="modulo-info">
+          <h4>Fechando o primeiro cliente</h4>
+          <p>Script completo de abordagem fria + respostas para as 3 objeções mais comuns</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUANTO GANHA -->
+<section class="secao ganho-bg">
+  <div class="container">
+    <div class="tag tag-verde">Potencial de ganho</div>
+    <h2 class="secao-titulo">Quanto você pode ganhar <em>por mês</em></h2>
+    <p class="secao-sub">Esses são números conservadores baseados nos planos ensinados no guia.</p>
+    <div class="ganho-grid">
+      <div class="ganho-card">
+        <div class="valor">R$500</div>
+        <div class="descricao"><strong>1 cliente</strong> no plano Starter — implementação única</div>
+      </div>
+      <div class="ganho-card">
+        <div class="valor">R$1.500</div>
+        <div class="descricao"><strong>3 clientes</strong> Starter em um mês de prospecção</div>
+      </div>
+      <div class="ganho-card">
+        <div class="valor">R$1.500</div>
+        <div class="descricao"><strong>5 clientes</strong> em manutenção recorrente de R$300/mês cada</div>
+      </div>
+      <div class="ganho-card">
+        <div class="valor">R$5.000+</div>
+        <div class="descricao"><strong>Combinando</strong> novos clientes + recorrência após 3 meses</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUEM É -->
+<section class="secao">
+  <div class="container">
+    <div class="tag tag-ciano">Para quem é</div>
+    <h2 class="secao-titulo">Este guia foi feito para <em>você</em> se...</h2>
+    <p class="secao-sub">Não precisa de experiência técnica. Precisa de disposição para seguir o passo a passo.</p>
+    <div class="para-quem-lista">
+      <div class="para-quem-item">Quer uma renda extra sem depender de algoritmos ou redes sociais</div>
+      <div class="para-quem-item">Está desempregado ou quer complementar sua renda atual</div>
+      <div class="para-quem-item">Nunca trabalhou com tecnologia mas quer entrar nesse mercado</div>
+      <div class="para-quem-item">Já tentou outros modelos de renda online e não conseguiu resultado</div>
+      <div class="para-quem-item">Quer um serviço escalável que pode vender para vários clientes ao mesmo tempo</div>
+      <div class="para-quem-item">Tem pelo menos 2 horas por dia para dedicar ao aprendizado e prospecção</div>
+    </div>
+
+    <!-- ORDER BUMP -->
+    <div class="bump-box">
+      <div class="tag tag-amarelo">Oferta especial — inclua no seu pedido</div>
+      <p class="bump-titulo">🤖 Template do Agente Pronto no N8N</p>
+      <p class="bump-desc">
+        Além do guia em PDF, você pode levar o template do agente já montado e configurado no N8N — pronto para importar, personalizar com as informações do seu cliente e entregar em minutos. Sem precisar montar do zero.
+        <br><br>
+        É o mesmo template que ensinamos a construir no guia — mas já pronto para quem quer economizar tempo e começar a vender mais rápido.
+      </p>
+      <p class="bump-preco">+ R$19,90 <span style="font-size:14px; color: var(--cinza); font-family: 'DM Sans'; font-weight: 300;">adicionado no checkout</span></p>
+    </div>
+
+    <!-- GARANTIA -->
+    <div class="garantia-box">
+      <div class="garantia-icon">🛡️</div>
+      <div>
+        <h3 class="garantia-titulo">Garantia incondicional de 7 dias</h3>
+        <p class="garantia-texto">
+          Se por qualquer motivo você não ficar satisfeito com o conteúdo nos primeiros 7 dias após a compra, basta enviar uma mensagem e devolvemos 100% do seu investimento. Sem perguntas, sem burocracia. O risco é zero.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section class="secao preco-bg" id="comprar">
+  <div class="container">
+    <div class="tag tag-ciano" style="display:block; text-align:center; margin-bottom:40px;">Acesso imediato</div>
+    <div class="preco-box">
+      <p class="preco-de">De R$97,00</p>
+      <p class="preco-por"><span>R$</span>27<span style="font-size:36px">,00</span></p>
+      <p class="preco-label">pagamento único · acesso vitalício</p>
+      <div class="preco-inclui">
+        <div class="preco-inclui-item">Guia Agente24hrs em PDF — 10 capítulos completos</div>
+        <div class="preco-inclui-item">Script de vendas e abordagem pronto para usar</div>
+        <div class="preco-inclui-item">3 modelos de precificação e proposta comercial</div>
+        <div class="preco-inclui-item">Acesso vitalício com atualizações incluídas</div>
+        <div class="preco-inclui-item">Garantia incondicional de 7 dias</div>
+      </div>
+      <a href="SEU_LINK_HOTMART_AQUI" class="btn-comprar">Quero acesso agora — R$27,00</a>
+      <p class="preco-seguranca">🔒 Pagamento 100% seguro via Hotmart · Pix, cartão de crédito ou boleto</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="secao">
+  <div class="container">
+    <div class="tag tag-ciano">Dúvidas frequentes</div>
+    <h2 class="secao-titulo" style="margin-bottom:48px;">Perguntas <em>frequentes</em></h2>
+    <div class="faq-lista">
+      <div class="faq-item">
+        <button class="faq-pergunta">Preciso saber programar para aplicar o conteúdo? <span class="faq-seta">+</span></button>
+        <p class="faq-resposta">Não. O guia foi escrito especificamente para quem não tem formação técnica. O N8N funciona de forma visual — você conecta blocos, não escreve código. Cada passo é explicado com prints e instruções diretas.</p>
+      </div>
+      <div class="faq-item">
+        <button class="faq-pergunta">Quanto preciso investir além do guia para começar? <span class="faq-seta">+</span></button>
+        <p class="faq-resposta">Para testar, você pode começar com zero de custo adicional — usando o trial gratuito do N8N Cloud e o Google Gemini (gratuito). Para um setup mais robusto e profissional, um servidor VPS sai a partir de R$30 por mês.</p>
+      </div>
+      <div class="faq-item">
+        <button class="faq-pergunta">Em quanto tempo consigo meu primeiro cliente? <span class="faq-seta">+</span></button>
+        <p class="faq-resposta">Depende de quanto você aplica. O guia inclui um script de abordagem fria pronto. Abordando 10 negócios com o script fornecido, a média de quem segue o processo é de 7 dias para fechar o primeiro cliente.</p>
+      </div>
+      <div class="faq-item">
+        <button class="faq-pergunta">Como recebo o material após a compra? <span class="faq-seta">+</span></button>
+        <p class="faq-resposta">Imediatamente após a confirmação do pagamento, você recebe um e-mail da Hotmart com o link de acesso ao material. O acesso é vitalício — você pode baixar e consultar quando quiser.</p>
+      </div>
+      <div class="faq-item">
+        <button class="faq-pergunta">E se eu não gostar? <span class="faq-seta">+</span></button>
+        <p class="faq-resposta">Você tem 7 dias de garantia incondicional. Se por qualquer motivo não ficar satisfeito, basta solicitar o reembolso e devolvemos 100% do valor sem perguntas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p>
+      Agente24hrs · 2025 · Todos os direitos reservados<br>
+      Este produto é distribuído pela plataforma Hotmart.<br>
+      O conteúdo é de caráter educativo e não garante resultados financeiros específicos.
+    </p>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-pergunta').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const aberto = item.classList.contains('aberto');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('aberto'));
+      if (!aberto) item.classList.add('aberto');
+    });
+  });
+
+  // Scroll suave para CTA
+  document.querySelectorAll('a[href="#comprar"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('comprar').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
